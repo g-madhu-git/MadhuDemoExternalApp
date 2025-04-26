@@ -1,36 +1,57 @@
 
 <!DOCTYPE html>
-<html>
-    <head>
-        <title><%= title %></title>
-        <!-- Include the Salesforce Canvas SDK -->
-        <!--script src="https://platform.salesforce.com/canvas/sdk/3.0/canvas.js"></script-->
-    </head>
-    <body>
-        <h1>Welcome, <%= title %></h1>
-        <button id="publishButton">Publish Event to Salesforce</button>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Event Publisher and Subscriber</title>
+    <!-- Include Salesforce Canvas SDK -->
+    <script src="https://ibfunding--mat2lai.sandbox.my.site.com/canvas/sdk/js/61.0/canvas-all.js"></script>
+</head>
+<body>
+    <h1>Canvas Event Publisher and Subscriber</h1>
 
-        <script>
-            // Ensure that the SDK has been loaded before initializing CanvasApp
-            if (typeof force !== 'undefined' && force.CanvasApp) {
-                // Initialize Salesforce Canvas SDK
-                var canvasApp = new force.CanvasApp();
+    <!-- Button to trigger event publishing -->
+    <button id="publishButton">Publish Event</button>
 
-                // Subscribe to an event (replace 'eventName' with your actual event)
-                canvasApp.subscribe('eventName', function(message) {
-                    console.log('Received message from Salesforce:', message);
+    <script>
+        // Wait for the Salesforce Canvas SDK to be initialized
+        Sfdc.canvas(function() {
+            // Parse the signed request to retrieve the Salesforce client context
+            var sr = JSON.parse('<%= signedRequestJson %>');  // signedRequestJson is passed from the server
+
+            // Subscribe to a custom event
+            Sfdc.canvas.client.subscribe(sr.client, {
+                name: 'myowncanvasappevent,  // Event name with namespace
+                onData: function(event) {           // Event handler function
+                    console.log("Received event:", event);
+                    alert("Event Received: " + JSON.stringify(event));
+                }
+            });
+
+            console.log("Subscribed to 'mynamespace.statusChanged'");
+
+            // Add event listener to the publish button
+            document.getElementById('publishButton').addEventListener('click', function() {
+                // Prepare the payload for the event
+                var payload = {
+                    status: 'Completed',
+                    message: 'The process finished successfully'
+                };
+
+                // Publish the event to Salesforce
+                Sfdc.canvas.client.publish(sr.client, {
+                    name: 'mynamespace.statusChanged',  // Event name (with namespace if needed)
+                    payload: payload                    // The event payload
                 });
 
-                // Publish an event to Salesforce when the button is clicked
-                document.getElementById('publishButton').addEventListener('click', function() {
-                    canvasApp.publish('eventName', { message: 'Hello from external app!' });
-                });
-            } else {
-                console.error("Canvas SDK is not loaded.");
-            }
-        </script>
-    </body>
+                console.log("Event 'mynamespace.statusChanged' published with payload:", payload);
+            });
+        });
+    </script>
+</body>
 </html>
+
 
 
 <!--
