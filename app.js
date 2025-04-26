@@ -22,22 +22,26 @@ app.get('/', function (req, res) {
 
 app.post('/', function (req, res) { 
   var bodyArray = req.body.signed_request.split(".");
-    var consumerSecret = bodyArray[0];
-    var encoded_envelope = bodyArray[1];
+  var consumerSecret = bodyArray[0];
+  var encoded_envelope = bodyArray[1];
 
-    var check = crypto.createHmac("sha256", consumerSecretApp).update(encoded_envelope).digest("base64");
+  var check = crypto.createHmac("sha256", consumerSecretApp).update(encoded_envelope).digest("base64");
 
-    if (check === consumerSecret) { 
-        var envelope = JSON.parse(new Buffer(encoded_envelope, "base64").toString("ascii"));
-        //req.session.salesforce = envelope;
-        console.log("got the session object:");
-        console.log(envelope);
-        console.log(JSON.stringify(envelope) );
-        res.render('index', { title: envelope.context.user.userName, req : JSON.stringify(envelope) });
-    }else{
-        res.send("authentication failed");
-    } 
-})
+  if (check === consumerSecret) { 
+      var envelope = JSON.parse(new Buffer(encoded_envelope, "base64").toString("ascii"));
+      console.log("got the session object:");
+      console.log(envelope);
+      
+      // Send Salesforce context to EJS template
+      res.render('index', { 
+          title: envelope.context.user.userName, 
+          req : JSON.stringify(envelope), 
+          canvasContext: envelope.context 
+      });
+  } else {
+      res.send("authentication failed");
+  } 
+});
  
 app.listen(3000 , function () {
 	console.log ("server is listening!!!");

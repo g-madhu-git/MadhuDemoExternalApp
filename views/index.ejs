@@ -1,5 +1,40 @@
 
 <!DOCTYPE html>
+<html>
+    <head>
+        <title><%= title %></title>
+        <!-- Include the Salesforce Canvas SDK -->
+        <script src="https://platform.salesforce.com/canvas/sdk/3.0/canvas.js"></script>
+    </head>
+    <body>
+        <h1>Welcome, <%= title %></h1>
+        <button id="publishButton">Publish Event to Salesforce</button>
+
+        <script>
+            // Ensure that the SDK has been loaded before initializing CanvasApp
+            if (typeof force !== 'undefined' && force.CanvasApp) {
+                // Initialize Salesforce Canvas SDK
+                var canvasApp = new force.CanvasApp();
+
+                // Subscribe to an event (replace 'eventName' with your actual event)
+                canvasApp.subscribe('eventName', function(message) {
+                    console.log('Received message from Salesforce:', message);
+                });
+
+                // Publish an event to Salesforce when the button is clicked
+                document.getElementById('publishButton').addEventListener('click', function() {
+                    canvasApp.publish('eventName', { message: 'Hello from external app!' });
+                });
+            } else {
+                console.error("Canvas SDK is not loaded.");
+            }
+        </script>
+    </body>
+</html>
+
+
+<!--
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -20,13 +55,13 @@
  
         <div class="jumbotron">
             <h1 class="display-4"> Madhu, Canvas App Workinga as Expected </h1>
-            <!-- h2> Few Observations</h2>
+            <h2> Few Observations</h2>
             <p class="lead">
                 <ul>
                     <li> OAuth setting needed in Connected App for scope but no use of Callback URL.  </li>
                     <li>  Users must be preapproved for signed request, otherwise OAuth flow would be needed. </li> 
                 </ul> 
-            </p --> 
+            </p>
         </div> 
      
         <p>
@@ -51,3 +86,5 @@
     </script>
 </body> 
 </html>
+
+-->
