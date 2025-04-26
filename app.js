@@ -3,7 +3,7 @@ var express = require('express'),
   path = require('path') 
 var app = express();
 var crypto = require("crypto");
-var consumerSecretApp = '49E3276C8854736D9F01F1CDA3C5F98201BAE5C2657F899CC8629FD16A0A4918';//process.env.CANVAS_CONSUMER_SECRET || 
+var consumerSecretApp = '49E3276C8854736D9F01F1CDA3C5F98201BAE5C2657F899CC8629FD16A0A4918';//process.env.CANVAS_CONSUMER_SECRET Test_Own_React_App (mat2lai Connected App)
 
 console.log('consumer secret - '+consumerSecretApp);
 
