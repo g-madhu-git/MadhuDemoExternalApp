@@ -82,7 +82,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Welcome <%= userName %>!</h1>
+        <h1>Welcome <%= firstName %>!</h1>
         <h2>Canvas Event Publisher and Subscriber</h2>
         <h3>Canvas App Working as Expected</h3>
 
@@ -101,8 +101,8 @@
         // Wait for the Salesforce Canvas SDK to be initialized
         Sfdc.canvas(function() {
             // Parse the signed request to retrieve the Salesforce client context
-            var sr = JSON.parse('<%= req %>');  // signedRequestJson is passed from the server
-
+            var sr = JSON.parse('<%- JSON.stringify(req) %>');  // safely stringify and escape the 'req' variable
+    
             // Subscribe to a custom event
             Sfdc.canvas.client.subscribe(sr.client, {
                 name: 'myowncanvasappevent',  // Event name with namespace
@@ -111,9 +111,9 @@
                     alert("Event Received: " + JSON.stringify(event));
                 }
             });
-
-            console.log("Subscribed to 'mynamespace.statusChanged'");
-
+    
+            console.log("Subscribed to 'myowncanvasappevent'");
+    
             // Add event listener to the publish button
             document.getElementById('publishButton').addEventListener('click', function() {
                 // Prepare the payload for the event
@@ -121,35 +121,21 @@
                     status: 'Completed',
                     message: 'The process finished successfully'
                 };
-
+    
                 // Publish the event to Salesforce
                 Sfdc.canvas.client.publish(sr.client, {
-                    name: 'myonwnpublishevent',  // Event name (with namespace if needed)
+                    name: 'myownpublishevent',  // Event name (with namespace if needed)
                     payload: payload                    // The event payload
                 });
-
+    
                 console.log("Event payload:", payload);
-
+    
                 // Display a success message
                 var alert = document.getElementById('statusAlert');
                 alert.style.display = 'block';
                 alert.textContent = 'Event successfully published to Salesforce!';
             });
         });
-
-        /*let req = "<%= req %>";
-        var decodedString = req.split('&quot;').join('"');
-        var wrapper = document.getElementById("reqCode");
-        
-        var dataStr = decodedString;
-        try {
-            var data = JSON.parse(dataStr);
-        } catch (e) {
-            console.error('Failed to parse JSON:', e);
-        }
-
-        // Create json-tree to visualize JSON data
-        var tree = jsonTree.create(data, wrapper);*/
-    </script>
+    </script>    
 </body>
 </html>

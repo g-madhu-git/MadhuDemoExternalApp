@@ -51,7 +51,7 @@ app.post('/', function (req, res) {
 
             // Pass the Salesforce context to the EJS template
             res.render('index', {
-                userName: envelope.context.user.firstName,
+                firstName: envelope.context.user.firstName,
                 req: JSON.stringify(envelope),
                 canvasContext: envelope.context
             });
