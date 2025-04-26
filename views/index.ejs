@@ -101,7 +101,7 @@
         // Wait for the Salesforce Canvas SDK to be initialized
         Sfdc.canvas(function() {
             // Parse the signed request to retrieve the Salesforce client context
-            var sr = JSON.parse('<%= signedRequestJson %>');  // signedRequestJson is passed from the server
+            var sr = JSON.parse('<%= req %>');  // signedRequestJson is passed from the server
 
             // Subscribe to a custom event
             Sfdc.canvas.client.subscribe(sr.client, {
