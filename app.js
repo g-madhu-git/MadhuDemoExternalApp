@@ -3,7 +3,7 @@ var express = require('express'),
   path = require('path') 
 var app = express();
 var crypto = require("crypto");
-require('dotenv').config();
+require('dotenv').config(); //NOT REQ [ADDED  CANVAS_CONSUMER_SECRET as an environment variable on HOST] - Required for LOCALHOST
 var consumerSecretApp = process.env.CANVAS_CONSUMER_SECRET;
 
 console.log('consumer secret - '+consumerSecretApp);
