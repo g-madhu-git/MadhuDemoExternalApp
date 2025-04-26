@@ -1,19 +1,107 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Canvas Event Publisher and Subscriber</title>
-    <!-- Include Salesforce Canvas SDK -->
-    <script src="https://ibfunding--mat2lai.sandbox.my.site.com/canvas/sdk/js/61.0/canvas-all.js"></script>
+
+    <!-- Bootstrap CSS for quick styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" 
+          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" 
+          crossorigin="anonymous">
+
+    <style>
+        /* Custom CSS for styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+            padding-top: 50px;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        h2 {
+            color: #6c757d;
+        }
+
+        .btn {
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-size: 1.1rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .alert {
+            margin-top: 20px;
+            background-color: #28a745;
+            color: white;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .code-wrapper {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f1f1f1;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        /* Adding some styling for json-tree */
+        #reqCode {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: "Courier New", monospace;
+        }
+
+        .container-fluid {
+            padding: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Canvas Event Publisher and Subscriber</h1>
+    <div class="container">
+        <h1>Canvas Event Publisher and Subscriber</h1>
+        <h2>Canvas App Working as Expected</h2>
+        <p class="lead">
+            <ul>
+                <li>OAuth settings are needed in Connected App for scope, but no use of Callback URL.</li>
+                <li>Users must be pre-approved for signed requests; otherwise, OAuth flow would be needed.</li>
+            </ul>
+        </p>
 
-    <!-- Button to trigger event publishing -->
-    <button id="publishButton">Publish Event</button>
+        <button id="publishButton" class="btn btn-primary">Publish Event</button>
 
+        <!-- Container for displaying the event JSON data -->
+        <div id="reqCode" class="code-wrapper"></div>
+
+        <div id="statusAlert" class="alert" style="display: none;"></div> <!-- Alert for status updates -->
+
+    </div>
+
+    <script src="https://ibfunding--mat2lai.sandbox.my.site.com/canvas/sdk/js/61.0/canvas-all.js"></script>
+    
     <script>
         // Wait for the Salesforce Canvas SDK to be initialized
         Sfdc.canvas(function() {
@@ -22,7 +110,7 @@
 
             // Subscribe to a custom event
             Sfdc.canvas.client.subscribe(sr.client, {
-                name: 'myowncanvasappevent,  // Event name with namespace
+                name: 'myowncanvasappevent',  // Event name with namespace
                 onData: function(event) {           // Event handler function
                     console.log("Received event:", event);
                     alert("Event Received: " + JSON.stringify(event));
@@ -46,66 +134,27 @@
                 });
 
                 console.log("Event 'mynamespace.statusChanged' published with payload:", payload);
+
+                // Display a success message
+                var alert = document.getElementById('statusAlert');
+                alert.style.display = 'block';
+                alert.textContent = 'Event successfully published to Salesforce!';
             });
         });
-    </script>
-</body>
-</html>
 
-
-
-<!--
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Canvas Demo </title>
-   
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
-        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
- 
-    <link href="jsonTree.css" rel="stylesheet" />
-    <script src="jsonTree.js"></script>
-
-</head>
-
-<body>
-    <div class="container-fluid">
- 
-        <div class="jumbotron">
-            <h1 class="display-4"> Madhu, Canvas App Workinga as Expected </h1>
-            <h2> Few Observations</h2>
-            <p class="lead">
-                <ul>
-                    <li> OAuth setting needed in Connected App for scope but no use of Callback URL.  </li>
-                    <li>  Users must be preapproved for signed request, otherwise OAuth flow would be needed. </li> 
-                </ul> 
-            </p>
-        </div> 
-     
-        <p>
-            <div id="reqCode">
-
-            </div>
-        </p>
-
-    </div>  
-    <script>
-        let req = "<%= req %>"  ; 
-        var decodedString = req.split('&quot;').join('"')  ;  
-        var wrapper = document.getElementById("reqCode"); 
-        // or from a string by JSON.parse(str) method
+        let req = "<%= req %>";
+        var decodedString = req.split('&quot;').join('"');
+        var wrapper = document.getElementById("reqCode");
+        
         var dataStr = decodedString;
         try {
             var data = JSON.parse(dataStr);
-        } catch (e) {}
+        } catch (e) {
+            console.error('Failed to parse JSON:', e);
+        }
 
-        // Create json-tree
-        var tree = jsonTree.create(data, wrapper);  
+        // Create json-tree to visualize JSON data
+        var tree = jsonTree.create(data, wrapper);
     </script>
-</body> 
+</body>
 </html>
-
--->
