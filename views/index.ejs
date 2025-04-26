@@ -124,11 +124,11 @@
 
                 // Publish the event to Salesforce
                 Sfdc.canvas.client.publish(sr.client, {
-                    name: 'mynamespace.statusChanged',  // Event name (with namespace if needed)
+                    name: 'myonwnpublishevent',  // Event name (with namespace if needed)
                     payload: payload                    // The event payload
                 });
 
-                console.log("Event 'mynamespace.statusChanged' published with payload:", payload);
+                console.log("Event payload:", payload);
 
                 // Display a success message
                 var alert = document.getElementById('statusAlert');
