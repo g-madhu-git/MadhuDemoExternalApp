@@ -34,8 +34,8 @@ app.post('/', function (req, res) {
       
       // Send Salesforce context to EJS template
       res.render('index', { 
-          title: envelope.context.user.userName, 
-          req : JSON.stringify(envelope), 
+          userName: envelope.context.user.userName, 
+          signedRequestJson : JSON.stringify(envelope), 
           canvasContext: envelope.context 
       });
   } else {
