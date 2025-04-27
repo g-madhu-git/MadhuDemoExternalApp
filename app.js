@@ -34,29 +34,31 @@ app.post('/', function (req, res) {
 
     var consumerSecret = bodyArray[0];
     var encoded_envelope = bodyArray[1];
+    console.log('****consumerSecret*****' + consumerSecret);
+    console.log('****encoded_envelope*****' + encoded_envelope);
 
     // Verify the signature with the consumer secret
     var check = crypto.createHmac("sha256", consumerSecretApp)
                       .update(encoded_envelope)
                       .digest("base64");
-
+    console.log('****check*****' + check);
     // Compare signatures to ensure authenticity
     if (check === consumerSecret) {
         try {
-            // Decode and parse the envelope data
-            var envelope = JSON.parse(Buffer.from(encoded_envelope, "base64").toString("ascii"));
+            // Decode and parse the json_envelope data
+            var json_envelope = new Buffer.from(encoded_envelope, "base64").toString("utf8");
 
-            console.log("Successfully got the session object:");
-            console.log(envelope);
+            console.log('***json_envelope****',json_envelope);
 
             // Pass the Salesforce context to the EJS template
+            let parsedJsonEnvelop = JSON.parse(json_envelope);
             res.render('index', {
-                firstName: envelope.context.user.firstName,
-                req: JSON.stringify(envelope),
-                canvasContext: envelope.context
+                firstName: parsedJsonEnvelop.context.user.firstName,
+                req: parsedJsonEnvelop,
+                canvasContext: parsedJsonEnvelop.context
             });
         } catch (error) {
-            console.error("Error parsing envelope:", error);
+            console.error("Error parsing json_envelope:", error);
             res.status(500).send("Error processing the signed_request");
         }
     } else {
