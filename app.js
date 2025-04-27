@@ -6,7 +6,6 @@ var crypto = require("crypto");
 require('dotenv').config(); // To load environment variables like CANVAS_CONSUMER_SECRET
 var consumerSecretApp = process.env.CANVAS_CONSUMER_SECRET;
 
-console.log('consumer secret - ' + consumerSecretApp);
 
 app.use(express.static(path.join(__dirname, 'views')));
 app.set('view engine', 'ejs');
@@ -34,14 +33,13 @@ app.post('/', function (req, res) {
 
     var consumerSecret = bodyArray[0];
     var encoded_envelope = bodyArray[1];
-    console.log('****consumerSecret*****' + consumerSecret);
-    console.log('****encoded_envelope*****' + encoded_envelope);
-
     // Verify the signature with the consumer secret
     var check = crypto.createHmac("sha256", consumerSecretApp)
                       .update(encoded_envelope)
                       .digest("base64");
-    console.log('****check*****' + check);
+    console.log('****consumerSecret SignedReq*****' + consumerSecret);
+    console.log('****consumerSecretApp*****' + consumerSecretApp);
+    console.log('****check AppSecret*****' + check);
     // Compare signatures to ensure authenticity
     if (check === consumerSecret) {
         try {
@@ -52,6 +50,7 @@ app.post('/', function (req, res) {
 
             // Pass the Salesforce context to the EJS template
             let parsedJsonEnvelop = JSON.parse(json_envelope);
+            console.log('***parsedJsonEnvelop****',parsedJsonEnvelop);
             res.render('index', {
                 firstName: parsedJsonEnvelop.context.user.firstName,
                 req: parsedJsonEnvelop,
