@@ -97,12 +97,16 @@
 
     <script src="https://ibfunding--mat2lai.sandbox.my.site.com/canvas/sdk/js/61.0/canvas-all.js"></script>
     
+    <script id="sr-data" type="application/json">
+        <%- JSON.stringify(req) %>
+    </script>
+
     <script>
         // Wait for the Salesforce Canvas SDK to be initialized
         Sfdc.canvas(function() {
             // Parse the signed request to retrieve the Salesforce client context
-            var sr = JSON.parse('<%- JSON.stringify(req) %>');
-            console.log(sr);
+            var sr = JSON.parse(document.getElementById('sr-data').textContent);
+            console.log('*****sr*****',sr);
     
             // Subscribe to a custom event
             Sfdc.canvas.client.subscribe(sr.client, {
@@ -119,13 +123,12 @@
             document.getElementById('publishButton').addEventListener('click', function() {
                 // Prepare the payload for the event
                 var payload = {
-                    status: 'Completed',
-                    message: 'The process finished successfully'
+                    message: 'Hey, I am coming from external app (index.js) file.'
                 };
     
                 // Publish the event to Salesforce
                 Sfdc.canvas.client.publish(sr.client, {
-                    name: 'myownpublishevent',  // Event name (with namespace if needed)
+                    name: 'externalapp.publishevent',  // Event name (with namespace if needed)
                     payload: payload                    // The event payload
                 });
     
