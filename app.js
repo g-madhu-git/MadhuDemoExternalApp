@@ -1,4 +1,4 @@
-/*var express = require('express'),
+var express = require('express'),
     bodyParser = require('body-parser'),
     path = require('path');
 var app = express();
@@ -69,12 +69,12 @@ app.post('/', function (req, res) {
 // Start the Express server
 app.listen(3000, function () {
     console.log("Server is listening on port 3000!");
-});*/
+});
 
 
-require('dotenv').config();
-const express = require('express');
-const path = require('path');
+// require('dotenv').config();
+// const express = require('express');
+// const path = require('path');
 const jsforce = require('jsforce');
 const { CometD } = require('cometd-nodejs-client');
 
