@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Canvas Phone Listener</title>
+</head>
+<body>
+    <h1>Listening for Phone Click Events...</h1>
+    <div id="output">Waiting for event...</div>
+
+    <script>
+        const eventSource = new EventSource('/events');
+
+        eventSource.onmessage = function(event) {
+            document.getElementById('output').textContent = 'Phone Number Clicked: ' + event.data;
+        };
+    </script>
+</body>
+</html>
