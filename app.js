@@ -1,4 +1,4 @@
-var express = require('express'),
+/*var express = require('express'),
     bodyParser = require('body-parser'),
     path = require('path');
 var app = express();
@@ -69,4 +69,56 @@ app.post('/', function (req, res) {
 // Start the Express server
 app.listen(3000, function () {
     console.log("Server is listening on port 3000!");
+});*/
+
+
+require('dotenv').config();
+const express = require('express');
+const path = require('path');
+const jsforce = require('jsforce');
+const { CometD } = require('cometd-nodejs-client');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Serve basic Canvas HTML
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Salesforce credentials and connection
+const conn = new jsforce.Connection({
+    loginUrl: process.env.SF_LOGIN_URL
+});
+
+conn.login(process.env.SF_USER_NAME, process.env.SF_PASSWORD + process.env.SF_TOKEN, (err) => {
+    if (err) return console.error('Login error:', err);
+
+    console.log('Logged into Salesforce');
+
+    // Setup CometD for Platform Events
+    const cometd = new CometD();
+
+    cometd.configure({
+        url: `${conn.instanceUrl}/cometd/60.0/`,
+        requestHeaders: {
+            Authorization: `Bearer ${conn.accessToken}`
+        }
+    });
+
+    cometd.handshake(handshakeReply => {
+        if (handshakeReply.successful) {
+            console.log('Handshake successful');
+            cometd.subscribe('/event/PhoneClickedEvent__e', message => {
+                const phoneNumber = message.data.payload.PhoneNumber__c;
+                console.log('Received phone number event:', phoneNumber);
+            });
+        } else {
+            console.error('Handshake failed:', handshakeReply);
+        }
+    });
+});
+
+app.listen(PORT, () => {
+    console.log(`Canvas app listening at http://localhost:${PORT}`);
 });
