@@ -67,7 +67,7 @@
 
                     // Subscribe to Salesforce Canvas events
                     Sfdc.canvas.client.subscribe(sr.client, {
-                        name: 'myowncanvasappevent',
+                        name: 'testOwnCanvasAppEvent',//Salesforce AURA event testOwnCanvasAppEvent.evt
                         onData: function(event) {
                             console.log("Received event:", event);
                             alert("Event Received: " + JSON.stringify(event));
