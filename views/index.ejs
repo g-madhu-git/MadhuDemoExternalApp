@@ -63,18 +63,69 @@
             Sfdc.canvas(function() {
                 try {
                     const sr = JSON.parse(document.getElementById('sr-data').textContent);
-                    console.log('Signed Request:', sr);
+                    console.log('Madhu--Signed Request:', sr);
 
-                    // Subscribe to Salesforce Canvas events
+                    // Subscribe to PushTopic
+                    /*var handler1 = function(event) { 
+                        console.log("PushTopic Event Data:", event);
+                        alert("PushTopic Event Received: " + JSON.stringify(event));
+                    };
+                    var handler2 = function() { 
+                        console.log("PushTopic Subscription complete."); 
+                    };
                     Sfdc.canvas.client.subscribe(sr.client, {
-                        name: 'testOwnCanvasAppEvent',//Salesforce AURA event testOwnCanvasAppEvent.evt
-                        onData: function(event) {
-                            console.log("Received event:", event);
-                            alert("Event Received: " + JSON.stringify(event));
-                        }
+                        name: 'sfdc.streamingapi', 
+                        params: { topic: "/topic/OpportunityUpdates" }, // PushTopic
+                        onData: handler1,
+                        onComplete: handler2
+                    });*/
+
+                    // Subscribe to OpportunityChangeEvent (CDC Event)
+                    /*var cdcHandler = function(event) {
+                        console.log("CDC Event Data:", event);
+                        alert("CDC Event Received: " + JSON.stringify(event));
+                    };
+                    var cdcComplete = function() {
+                        console.log("CDC Event Subscription complete.");
+                    };
+                    Sfdc.canvas.client.subscribe(sr.client, {
+                        name: 'sfdc.streamingapi', 
+                        params: { topic: "/data/OpportunityChangeEvent" }, // Change Data Capture Event
+                        onData: cdcHandler,
+                        onComplete: cdcComplete
+                    });*/
+
+                    // Subscribe to Custom Platform Event: Comms_Platform__e
+                    var customEventHandler = function(event) {
+                        console.log("Custom Platform Event Data:", event);
+                        alert("Custom Event Received: " + JSON.stringify(event));
+                    };
+                    var customEventComplete = function() {
+                        console.log("Custom Platform Event Subscription complete.");
+                    };
+                    Sfdc.canvas.client.subscribe(sr.client, {
+                        name: 'sfdc.streamingapi', 
+                        params: { topic: "/event/Comms_Platform__e" }, // Custom Platform Event
+                        onData: customEventHandler,
+                        onComplete: customEventComplete
                     });
 
-                    // Publish event to Salesforce
+                    // Subscribe to Standard Platform Event: OrderStatusChangedEvent
+                    /*var platformEventHandler = function(event) {
+                        console.log("Standard Platform Event Data:", event);
+                        alert("Platform Event Received: " + JSON.stringify(event));
+                    };
+                    var platformEventComplete = function() {
+                        console.log("Standard Platform Event Subscription complete.");
+                    };
+                    Sfdc.canvas.client.subscribe(sr.client, {
+                        name: 'sfdc.streamingapi', 
+                        params: { topic: "/event/OrderStatusChangedEvent" }, // Standard Platform Event
+                        onData: platformEventHandler,
+                        onComplete: platformEventComplete
+                    });*/
+
+                    // Publish event to Salesforce on button click
                     document.getElementById('publishButton').addEventListener('click', function() {
                         const payload = { message: 'Hey, I am coming from external app (index.js) file.' };
                         Sfdc.canvas.client.publish(sr.client, {
@@ -93,6 +144,6 @@
     </script>
     
     <!-- Salesforce Canvas SDK -->
-    <script src="https://ibfunding--mat2lai.sandbox.my.site.com/canvas/sdk/js/61.0/canvas-all.js" onload="initializeCanvasApp()"></script>
+    <script src="https://ibfunding--mat2lai.sandbox.my.site.com/canvas/sdk/js/63.0/canvas-all.js" onload="initializeCanvasApp()"></script>
 </body>
 </html>
