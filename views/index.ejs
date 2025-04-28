@@ -41,10 +41,14 @@
         <div id="statusAlert" class="alert alert-success"></div>
     </div>
 
-    <script src="https://ibfunding--mat2lai.sandbox.my.site.com/canvas/sdk/js/61.0/canvas-all.js" defer></script>
+    <!-- Salesforce Canvas SDK -->
+    <script src="https://ibfunding--mat2lai.sandbox.my.site.com/canvas/sdk/js/61.0/canvas-all.js" onload="initializeCanvasApp()"></script>
+
+    <!-- Signed Request Data -->
     <script id="sr-data" type="application/json">
         <%- JSON.stringify(req) %>
     </script>
+
     <script>
         function showAlert(message) {
             const alert = document.getElementById('statusAlert');
@@ -52,33 +56,43 @@
             alert.textContent = message;
         }
 
-        Sfdc.canvas(function() {
-            try {
-                const sr = JSON.parse(document.getElementById('sr-data').textContent);
-                console.log('Signed Request:', sr);
-
-                Sfdc.canvas.client.subscribe(sr.client, {
-                    name: 'myowncanvasappevent',
-                    onData: function(event) {
-                        console.log("Received event:", event);
-                        alert("Event Received: " + JSON.stringify(event));
-                    }
-                });
-
-                document.getElementById('publishButton').addEventListener('click', function() {
-                    const payload = { message: 'Hey, I am coming from external app (index.ejs) file.' };
-                    Sfdc.canvas.client.publish(sr.client, {
-                        name: 'externalapp.publishevent',
-                        payload: payload
-                    });
-                    console.log("Event payload:", payload);
-                    showAlert('Event successfully published to Salesforce!');
-                });
-            } catch (error) {
-                console.error('Error initializing Canvas app:', error);
-                showAlert('An error occurred. Please try again.');
+        function initializeCanvasApp() {
+            if (typeof Sfdc === 'undefined' || !Sfdc.canvas) {
+                console.error('Salesforce Canvas SDK is not loaded.');
+                showAlert('Failed to load Salesforce Canvas SDK.');
+                return;
             }
-        });
+
+            Sfdc.canvas(function() {
+                try {
+                    const sr = JSON.parse(document.getElementById('sr-data').textContent);
+                    console.log('Signed Request:', sr);
+
+                    // Subscribe to Salesforce Canvas events
+                    Sfdc.canvas.client.subscribe(sr.client, {
+                        name: 'myowncanvasappevent',
+                        onData: function(event) {
+                            console.log("Received event:", event);
+                            alert("Event Received: " + JSON.stringify(event));
+                        }
+                    });
+
+                    // Publish event to Salesforce
+                    document.getElementById('publishButton').addEventListener('click', function() {
+                        const payload = { message: 'Hey, I am coming from external app (index.js) file.' };
+                        Sfdc.canvas.client.publish(sr.client, {
+                            name: 'externalapp.publishevent',
+                            payload: payload
+                        });
+                        console.log("Event payload:", payload);
+                        showAlert('Event successfully published to Salesforce!');
+                    });
+                } catch (error) {
+                    console.error('Error initializing Canvas app:', error);
+                    showAlert('An error occurred. Please try again.');
+                }
+            });
+        }
     </script>
 </body>
 </html>
