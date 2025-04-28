@@ -109,7 +109,7 @@ conn.login(process.env.SF_USER_NAME, process.env.SF_PASSWORD + process.env.SF_TO
     cometd.handshake(handshakeReply => {
         if (handshakeReply.successful) {
             console.log('Handshake successful');
-            cometd.subscribe('/event/PhoneClickedEvent__e', message => {
+            cometd.subscribe('/event/Comms_Platform__e', message => {
                 const phoneNumber = message.data.payload.PhoneNumber__c;
                 console.log('Received phone number event:', phoneNumber);
             });
