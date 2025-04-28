@@ -5,78 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Canvas Event Publisher and Subscriber</title>
 
-    <!-- Bootstrap CSS for quick styling -->
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" 
           integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" 
           crossorigin="anonymous">
 
     <style>
-        /* Custom CSS for styling */
+        /* Custom CSS */
         body {
             font-family: Arial, sans-serif;
             background-color: #f8f9fa;
             color: #343a40;
             padding-top: 50px;
         }
-
         .container {
             background-color: white;
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
         }
-
-        h1 {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #007bff;
-        }
-
-        h2 {
-            color: #6c757d;
-        }
-
-        .btn {
-            background-color: #007bff;
-            color: white;
-            border-radius: 4px;
-            padding: 10px 20px;
-            font-size: 1.1rem;
-            border: none;
-            cursor: pointer;
-        }
-
         .btn:hover {
             background-color: #0056b3;
         }
-
         .alert {
-            margin-top: 20px;
-            background-color: #28a745;
-            color: white;
-            font-weight: bold;
-            padding: 10px;
-            border-radius: 5px;
-        }
-
-        .code-wrapper {
-            margin-top: 30px;
-            padding: 20px;
-            background-color: #f1f1f1;
-            border-radius: 8px;
-            overflow-x: auto;
-        }
-
-        /* Adding some styling for json-tree */
-        #reqCode {
-            background-color: #e9ecef;
-            padding: 15px;
-            border-radius: 5px;
-            font-family: "Courier New", monospace;
-        }
-
-        .container-fluid {
-            padding: 20px;
+            display: none;
         }
     </style>
 </head>
@@ -84,62 +36,49 @@
     <div class="container">
         <h1>Welcome <%= firstName %>!</h1>
         <h2>Canvas Event Publisher and Subscriber</h2>
-        <h3>Canvas App Working as Expected</h3>
-
-        <button id="publishButton" class="btn btn-primary">Publish Event</button>
-
-        <!-- Container for displaying the event JSON data -->
+        <button id="publishButton" class="btn btn-primary" aria-label="Publish Event">Publish Event</button>
         <div id="reqCode" class="code-wrapper"></div>
-
-        <div id="statusAlert" class="alert" style="display: none;"></div> <!-- Alert for status updates -->
-
+        <div id="statusAlert" class="alert alert-success"></div>
     </div>
 
-    <script src="https://ibfunding--mat2lai.sandbox.my.site.com/canvas/sdk/js/61.0/canvas-all.js"></script>
-    
+    <script src="https://ibfunding--mat2lai.sandbox.my.site.com/canvas/sdk/js/61.0/canvas-all.js" defer></script>
     <script id="sr-data" type="application/json">
         <%- JSON.stringify(req) %>
     </script>
-
     <script>
-        // Wait for the Salesforce Canvas SDK to be initialized
+        function showAlert(message) {
+            const alert = document.getElementById('statusAlert');
+            alert.style.display = 'block';
+            alert.textContent = message;
+        }
+
         Sfdc.canvas(function() {
-            // Parse the signed request to retrieve the Salesforce client context
-            var sr = JSON.parse(document.getElementById('sr-data').textContent);
-            console.log('*****sr*****',sr);
-    
-            // Subscribe to a custom event
-            Sfdc.canvas.client.subscribe(sr.client, {
-                name: 'myowncanvasappevent',  // Event name with namespace
-                onData: function(event) {           // Event handler function
-                    console.log("Received event:", event);
-                    alert("Event Received: " + JSON.stringify(event));
-                }
-            });
-    
-            console.log("Subscribed to 'myowncanvasappevent'");
-    
-            // Add event listener to the publish button
-            document.getElementById('publishButton').addEventListener('click', function() {
-                // Prepare the payload for the event
-                var payload = {
-                    message: 'Hey, I am coming from external app (index.js) file.'
-                };
-    
-                // Publish the event to Salesforce
-                Sfdc.canvas.client.publish(sr.client, {
-                    name: 'externalapp.publishevent',  // Event name (with namespace if needed)
-                    payload: payload                    // The event payload
+            try {
+                const sr = JSON.parse(document.getElementById('sr-data').textContent);
+                console.log('Signed Request:', sr);
+
+                Sfdc.canvas.client.subscribe(sr.client, {
+                    name: 'myowncanvasappevent',
+                    onData: function(event) {
+                        console.log("Received event:", event);
+                        alert("Event Received: " + JSON.stringify(event));
+                    }
                 });
-    
-                console.log("Event payload:", payload);
-    
-                // Display a success message
-                var alert = document.getElementById('statusAlert');
-                alert.style.display = 'block';
-                alert.textContent = 'Event successfully published to Salesforce!';
-            });
+
+                document.getElementById('publishButton').addEventListener('click', function() {
+                    const payload = { message: 'Hey, I am coming from external app (index.ejs) file.' };
+                    Sfdc.canvas.client.publish(sr.client, {
+                        name: 'externalapp.publishevent',
+                        payload: payload
+                    });
+                    console.log("Event payload:", payload);
+                    showAlert('Event successfully published to Salesforce!');
+                });
+            } catch (error) {
+                console.error('Error initializing Canvas app:', error);
+                showAlert('An error occurred. Please try again.');
+            }
         });
-    </script>    
+    </script>
 </body>
 </html>
